@@ -1,4 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:mime_type/mime_type.dart';
+import 'package:http_parser/http_parser.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -70,6 +73,42 @@ class ProductosProvider{
     print(decodedData);
 
     return true;
+
+  }
+
+  Future<String> subirImagen( File imagen) async{
+
+    final url = Uri.parse('https://api.cloudinary.com/v1_1/dia4a7qbt/image/upload?upload_preset=coymipjs');
+    final mimeType = mime(imagen.path).split('/');
+
+    final imageUploadRequest = http.MultipartRequest(
+      'POST',
+      url
+    );
+
+    final file = await http.MultipartFile.fromPath(
+      'file', 
+      imagen.path,
+      contentType: MediaType(mimeType[0], mimeType[1])
+    );
+
+    imageUploadRequest.files.add(file);
+
+
+    final streamResponse = await imageUploadRequest.send();
+    final resp = await http.Response.fromStream(streamResponse);
+
+    if(resp.statusCode != 200 && resp.statusCode != 201){
+      print('Algo salio mal');
+      print(resp.body);
+      return null;
+    }
+
+    final respData = json.decode(resp.body);
+    print(respData);
+
+    return respData['secure_url'];
+
 
   }
 

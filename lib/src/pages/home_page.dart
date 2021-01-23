@@ -44,13 +44,17 @@ class HomePage extends StatelessWidget {
       ),
       onDismissed: (direccion){
         // TODO: Borrar producto
+        productosProvider.borrarProducto(producto.id);
       },
       child: ListTile(
         title: Text('${producto.titulo } - ${producto.valor}'),
         subtitle: Text(producto.id),
-        onTap: () => Navigator.pushNamed(context, 'producto'),
+        onTap: () => Navigator.pushNamed(context, 'producto', arguments: producto),
       ),
+
+      
     );
+
   }
 
   _crearBoton(BuildContext context) {
